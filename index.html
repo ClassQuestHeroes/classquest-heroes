@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClassQuest Heroes - school network test</title>
+  <style>
+    :root {
+      --bg: #fdf8ee;
+      --card: #ffffff;
+      --ink: #2b2240;
+      --muted: #6b6280;
+      --ok: #1f8a4c;
+      --bad: #c0392b;
+      --wait: #9a7b1c;
+      --accent: #6a3fd1;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background: var(--bg);
+      color: var(--ink);
+      font: 18px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { color: var(--accent); margin: 0 0 4px; font-size: 32px; }
+    .lead { color: var(--muted); margin: 0 0 24px; }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(43, 34, 64, 0.08);
+      margin-bottom: 16px;
+    }
+    ul { list-style: none; margin: 0; padding: 0; }
+    li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid #eee; }
+    li:last-child { border-bottom: 0; }
+    .status { font-weight: 700; white-space: nowrap; }
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+    .wait { color: var(--wait); }
+    .big { font-size: 22px; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ClassQuest Heroes</h1>
+    <p class="lead">School network test. If you can read this, the page itself got through.</p>
+
+    <div class="card">
+      <p class="big" id="summary">Checking...</p>
+      <ul id="checks"></ul>
+    </div>
+
+    <div class="card">
+      <p>Please take a screenshot of this page on a school computer (on the school Wi-Fi) and send it to Claude.</p>
+      <p id="when"></p>
+    </div>
+  </main>
+
+  <script>
+    // Each check loads something the real game would need from that service.
+    // A blocked site usually returns a filter page instead, which fails these checks.
+    var checks = [
+      {
+        name: "This page (GitHub Pages)",
+        run: function () { return Promise.resolve(true); }
+      },
+      {
+        name: "Google Firebase code (gstatic.com)",
+        run: function () {
+          return loadScript("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js")
+            .then(function () { return typeof window.firebase !== "undefined"; });
+        }
+      },
+      {
+        name: "Google sign-in (accounts.google.com)",
+        run: function () { return loadImage("https://accounts.google.com/favicon.ico"); }
+      },
+      {
+        name: "Google database (firestore.googleapis.com)",
+        run: function () {
+          return fetch("https://firestore.googleapis.com/$discovery/rest?version=v1")
+            .then(function (res) { return res.json(); })
+            .then(function (data) { return data.name === "firestore"; })
+            .catch(function () { return false; });
+        }
+      }
+    ];
+
+    function loadScript(src) {
+      return new Promise(function (resolve) {
+        var s = document.createElement("script");
+        s.src = src;
+        s.onload = function () { resolve(true); };
+        s.onerror = function () { resolve(false); };
+        document.head.appendChild(s);
+      });
+    }
+
+    function loadImage(src) {
+      return new Promise(function (resolve) {
+        var img = new Image();
+        img.onload = function () { resolve(true); };
+        img.onerror = function () { resolve(false); };
+        img.src = src + "?t=" + Date.now();
+      });
+    }
+
+    function withTimeout(promise, ms) {
+      return Promise.race([
+        promise,
+        new Promise(function (resolve) { setTimeout(function () { resolve(false); }, ms); })
+      ]);
+    }
+
+    var list = document.getElementById("checks");
+    var results = checks.map(function (check) {
+      var li = document.createElement("li");
+      var label = document.createElement("span");
+      var status = document.createElement("span");
+      label.textContent = check.name;
+      status.className = "status wait";
+      status.textContent = "checking";
+      li.appendChild(label);
+      li.appendChild(status);
+      list.appendChild(li);
+
+      return withTimeout(check.run(), 10000).then(function (ok) {
+        status.className = "status " + (ok ? "ok" : "bad");
+        status.textContent = ok ? "works" : "blocked";
+        return ok;
+      });
+    });
+
+    Promise.all(results).then(function (oks) {
+      var allOk = oks.every(Boolean);
+      var summary = document.getElementById("summary");
+      summary.className = "big " + (allOk ? "ok" : "bad");
+      summary.textContent = allOk ? "Everything got through!" : "Some things were blocked.";
+      document.getElementById("when").textContent = "Tested " + new Date().toLocaleString("en-AU");
+    });
+  </script>
+</body>
+</html>
