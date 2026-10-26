@@ -14,7 +14,7 @@ A classroom rewards game for primary school classes. Teachers create magical cha
 
 ## Files
 
-- `app/game.js`: the game rules (no screen code), tested in `test/game.test.js` with `node --test test/`.
+- `app/game.js`: the game rules (no screen code), tested in `test/game.test.js` with `node --test`.
 - `app/app.js`: the screens.
 - `app/store.js`: saving. Demo mode saves in the browser; with `app/firebase-config.js` filled in, it saves to Firebase.
 - `firestore.rules`: each teacher can only see their own class.
