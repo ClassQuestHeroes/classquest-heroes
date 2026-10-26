@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClassQuest Heroes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">ClassQuest Heroes</div>
+    <div class="top-right">
+      <span id="quest-badge" class="badge"></span>
+      <button id="quest-toggle" class="btn small"></button>
+    </div>
+  </header>
+
+  <nav id="nav" class="nav" hidden>
+    <button data-view="board">Board</button>
+    <button data-view="morning">Morning</button>
+    <button data-view="gems">Gems</button>
+    <button data-view="week">Week</button>
+    <button data-view="setup">Setup</button>
+    <button data-view="log">Log</button>
+    <button data-view="quest" class="accent">Student turns</button>
+  </nav>
+
+  <main id="view" class="view"></main>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="game.js"></script>
+  <script src="store.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
